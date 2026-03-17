@@ -1,0 +1,119 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local StarterGui = game:GetService("StarterGui")
+
+local player = Players.LocalPlayer
+local godMode = false
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "GodModeGUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = player:WaitForChild("PlayerGui")
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Name = "MainFrame"
+mainFrame.Size = UDim2.new(0, 250, 0, 150)
+mainFrame.Position = UDim2.new(0.5, -125, 0.3, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = screenGui
+
+local uiCorner = Instance.new("UICorner")
+uiCorner.CornerRadius = UDim.new(0, 12)
+uiCorner.Parent = mainFrame
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 40)
+title.BackgroundTransparency = 1
+title.Text = "GOD MODE"
+title.TextColor3 = Color3.fromRGB(255, 80, 80)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 22
+title.Parent = mainFrame
+
+local titleCorner = Instance.new("UICorner")
+titleCorner.CornerRadius = UDim.new(0, 12)
+titleCorner.Parent = title
+
+local toggleButton = Instance.new("TextButton")
+toggleButton.Name = "ToggleButton"
+toggleButton.Size = UDim2.new(0.85, 0, 0.45, 0)
+toggleButton.Position = UDim2.new(0.075, 0, 0.35, 0)
+toggleButton.BackgroundColor3 = Color3.fromRGB(220, 20, 20)
+toggleButton.Text = "God Mode"
+toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+toggleButton.Font = Enum.Font.GothamBold
+toggleButton.TextSize = 22
+toggleButton.Parent = mainFrame
+
+local buttonCorner = Instance.new("UICorner")
+buttonCorner.CornerRadius = UDim.new(0, 10)
+buttonCorner.Parent = toggleButton
+
+local statusLabel = Instance.new("TextLabel")
+statusLabel.Size = UDim2.new(0.85, 0, 0.15, 0)
+statusLabel.Position = UDim2.new(0.075, 0, 0.82, 0)
+statusLabel.BackgroundTransparency = 1
+statusLabel.Text = "OFF"
+statusLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
+statusLabel.Font = Enum.Font.Gotham
+statusLabel.TextSize = 14
+statusLabel.Parent = mainFrame
+
+toggleButton.MouseEnter:Connect(function()
+    TweenService:Create(toggleButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(255, 50, 50)}):Play()
+end)
+toggleButton.MouseLeave:Connect(function()
+    if not godMode then
+        TweenService:Create(toggleButton, TweenInfo.new(0.2), {BackgroundColor3 = Color3.fromRGB(220, 20, 20)}):Play()
+    end
+end)
+
+local function updateButton()
+    if godMode then
+        toggleButton.BackgroundColor3 = Color3.fromRGB(0, 200, 80)
+        toggleButton.Text = "God Mode: ON"
+        statusLabel.Text = "IMMORTAL"
+        statusLabel.TextColor3 = Color3.fromRGB(0, 255, 100)
+        StarterGui:SetCore("SendNotification", {
+            Title = "GOD MODE",
+            Text = "ACTIVATED - You are now unkillable",
+            Duration = 3
+        })
+    else
+        toggleButton.BackgroundColor3 = Color3.fromRGB(220, 20, 20)
+        toggleButton.Text = "God Mode"
+        statusLabel.Text = "OFF"
+        statusLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
+        StarterGui:SetCore("SendNotification", {
+            Title = "GOD MODE",
+            Text = "DEACTIVATED",
+            Duration = 2
+        })
+    end
+end
+
+toggleButton.MouseButton1Click:Connect(function()
+    godMode = not godMode
+    updateButton()
+end)
+
+RunService.Heartbeat:Connect(function()
+    if not godMode then return end
+    
+    local character = player.Character
+    if character and character:FindFirstChild("Humanoid") then
+        local humanoid = character.Humanoid
+        humanoid.MaxHealth = 1e9
+        if humanoid.Health < humanoid.MaxHealth * 0.9 then
+            humanoid.Health = humanoid.MaxHealth
+        end
+    end
+end)
+
+updateButton()
+
+print("God Mode GUI loaded! Click the red button to toggle.")
